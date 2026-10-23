@@ -1,0 +1,30 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MIA · Cada punto cuenta · Mapa de desafíos</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap"><link rel="stylesheet" href="css/app.css"></head><body>
+<header><img class="logo" alt="MIA Global Consulting"></header>
+<main>
+<section id="p1"><span class="paso">Paso 1 de 3</span>
+<h1>¿Qué está dificultando que los proyectos de sostenibilidad funcionen en tu territorio?</h1>
+<p class="sub">Elige el desafío que consideras más importante.</p>
+<div id="listaDes"></div><button class="btn o" id="b1" disabled>Siguiente: mi estado →</button></section>
+<section id="p2" class="oculto"><span class="paso">Paso 2 de 3</span>
+<h2>Toca tu estado en el mapa</h2><p class="sub">Desafío: <b id="desElegido"></b></p>
+<div id="mapa"></div><div class="ley" id="ley2"></div>
+<select id="selEstado" aria-label="Estado"></select><p class="estado" id="estadoTxt"></p>
+<button class="btn o" id="b2" disabled>Siguiente: cuéntanos →</button></section>
+<section id="p3" class="oculto"><span class="paso">Paso 3 de 3</span><h2>Cuéntanos un poco más</h2>
+<form id="form"><label>Nombre<input name="nombre" required autocomplete="name"></label>
+<label>Tipo de problema<input name="tipo" required placeholder="Ej.: escasez de agua, falta de acuerdos…"></label>
+<label>Situaciones específicas de ese problema<textarea name="sit" placeholder="¿Qué pasa, dónde, a quién afecta?"></textarea></label>
+<label>Contacto (correo o WhatsApp)<input name="contacto" placeholder="Opcional"></label>
+<p class="nota">Tus datos solo los usa MIA Global Consulting para contactarte si lo deseas.</p>
+<button class="btn o" id="b3">Poner mi punto en el mapa</button></form></section>
+<section id="p4" class="oculto"><h2 id="guardado"></h2><p class="sub">Así se ve el mapa con todos los puntos:</p>
+<div id="mapaFinal" class="mapa"></div><div class="ley" id="ley4"></div><div id="barras"></div>
+<h2>¿Tu proyecto necesita avanzar?</h2><p class="sub">Agenda una conversación exploratoria con MIA.</p>
+<a class="btn o" id="bWA" target="_blank">📲 Agenda una cita con MIA por WhatsApp</a>
+<a class="btn w" id="bMail">✉️ danae@miaglobalconsulting.com</a>
+<button class="btn w" id="bOtro">Registrar otro punto</button></section>
+</main>
+<a id="waFijo" target="_blank">📲 Agenda una cita</a>
+<footer>MIA Global Consulting · <a href="mailto:danae@miaglobalconsulting.com">danae@miaglobalconsulting.com</a> · Cel/WhatsApp <a href="https://wa.me/524441749695">444 174 9695</a></footer>
+<script src="js/logo.js"></script><script src="js/config.js"></script><script src="js/mx.js"></script><script src="js/store.js"></script><script src="js/app.js"></script></body></html>

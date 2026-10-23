@@ -1,0 +1,36 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>MIA · Resultados</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap"><link rel="stylesheet" href="css/app.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script></head><body>
+<header><img class="logo" alt="MIA"></header><main style="max-width:1200px">
+<h1>Resultados · Mapa de desafíos</h1>
+<h2>1. Datos en la nube</h2>
+<label>Clave de administración<input id="clave" type="password" autocomplete="current-password"></label>
+<button class="btn" id="bCargar">Ver registros</button><p class="estado" id="msg"></p>
+<div id="nube" class="oculto"><button class="btn o" id="xN">⬇️ Descargar Excel (.xlsx)</button><button class="btn w" id="cN">⬇️ Descargar CSV</button><div id="tN"></div></div>
+<h2>2. Datos guardados en ESTE dispositivo (respaldo)</h2>
+<p class="nota" id="infoL"></p><button class="btn w" id="sync">🔄 Reintentar envío a la nube</button>
+<button class="btn o" id="xL">⬇️ Excel de este dispositivo</button><button class="btn w" id="cL">⬇️ CSV de este dispositivo</button><button class="btn w" id="jL">⬇️ JSON de este dispositivo</button>
+<button class="btn w" id="dL">🗑️ Borrar datos de este dispositivo</button><div id="tL"></div>
+</main>
+<script src="js/logo.js"></script><script src="js/config.js"></script><script src="js/mx.js"></script><script src="js/store.js"></script><script>
+const $=s=>document.querySelector(s),API=MIA_CFG.API;
+const COLS=[['fecha','Fecha/hora'],['estado','Estado'],['desafio','Desafío'],['color','Color'],['nombre','Nombre'],['tipo_problema','Tipo de problema'],['situaciones','Situaciones específicas'],['contacto','Contacto'],['pidio_cita','Pidió cita WhatsApp'],['prueba','Prueba'],['id','ID']];
+const fh=s=>{try{return new Date(s).toLocaleString('es-MX',{timeZone:'America/Mexico_City'})}catch(e){return s}};
+const filas=rs=>rs.map(r=>Object.fromEntries(COLS.map(([k,t])=>[t,k==='fecha'?fh(r[k]):typeof r[k]==='boolean'?(r[k]?'sí':'no'):(r[k]??'')])));
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function tabla(el,rs,borrar){const F=filas(rs);el.innerHTML=`<p>${rs.length} registros</p><div style="overflow:auto"><table><tr>${COLS.map(c=>`<th>${c[1]}</th>`).join('')}${borrar?'<th></th>':''}</tr>`+F.map((f,i)=>`<tr>${Object.values(f).map(v=>`<td>${esc(v)}</td>`).join('')}${borrar?`<td><button onclick="borrar('${rs[i].id}')">Borrar</button></td>`:''}</tr>`).join('')+'</table></div>';}
+function xlsx(rs,n){const ws=XLSX.utils.json_to_sheet(filas(rs));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Registros');XLSX.writeFile(wb,n+'.xlsx');}
+function bajar(txt,n,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:t}));a.download=n;a.click();}
+function csv(rs,n){const F=filas(rs),h=COLS.map(c=>c[1]);const q=v=>/[",\n]/.test(v=String(v))?'"'+v.replace(/"/g,'""')+'"':v;bajar('\ufeff'+[h.join(','),...F.map(f=>h.map(k=>q(f[k])).join(','))].join('\n'),n+'.csv','text/csv');}
+let NUBE=[];const hoy=()=>new Date().toISOString().slice(0,10);
+async function cargar(){$('#msg').textContent='Cargando…';try{const r=await fetch(API+'/datos?key='+encodeURIComponent($('#clave').value),{cache:'no-store'});const j=await r.json();
+ if(!r.ok)throw new Error(j.error||r.status);NUBE=j.registros;sessionStorage.k=$('#clave').value;$('#msg').textContent='';$('#nube').classList.remove('oculto');tabla($('#tN'),NUBE,true);}
+ catch(e){$('#msg').textContent='No se pudo cargar: '+e.message;}}
+async function borrar(id){if(!confirm('¿Borrar este registro de la nube?'))return;await fetch(API+'/datos?key='+encodeURIComponent($('#clave').value)+'&id='+id,{method:'DELETE'});cargar();}
+$('#bCargar').onclick=cargar;if(sessionStorage.k){$('#clave').value=sessionStorage.k;cargar();}
+$('#xN').onclick=()=>xlsx(NUBE,'MIA_mapa_desafios_'+hoy());$('#cN').onclick=()=>csv(NUBE,'MIA_mapa_desafios_'+hoy());
+function local(){const L=MIAStore.locales();$('#infoL').textContent=`${L.length} registros en este dispositivo · ${MIAStore.pendientes().length} pendientes de enviar a la nube`;tabla($('#tL'),L,false);return L;}
+$('#xL').onclick=()=>xlsx(local(),'MIA_dispositivo_'+hoy());$('#cL').onclick=()=>csv(local(),'MIA_dispositivo_'+hoy());$('#jL').onclick=()=>bajar(JSON.stringify(local(),null,1),'MIA_dispositivo_'+hoy()+'.json','application/json');
+$('#dL').onclick=()=>{if(confirm('¿Borrar TODOS los datos guardados en este dispositivo?')){MIAStore.borrarLocal();local();}};
+$('#sync').onclick=async()=>{const n=await MIAStore.sincronizar();alert(n+' registros enviados');local();};local();
+</script></body></html>
